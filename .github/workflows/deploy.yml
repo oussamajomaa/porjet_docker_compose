@@ -44,6 +44,5 @@ jobs:
               cd projet_docker_compose
             fi
 
-            # Déploiement Docker
             docker compose down
             docker compose up -d --build --force-recreate
