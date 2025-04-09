@@ -21,10 +21,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Dossier du projet sur le VPS
             cd ~
             if [ ! -d "projet_docker_compose/.git" ]; then
-              git clone https://github.com/<TON_USER>/<TON_REPO>.git projet_docker_compose
+              git clone https://github.com/osmjom/projet_docker_compose.git projet_docker_compose
             fi
 
             cd projet_docker_compose
