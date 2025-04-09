@@ -21,8 +21,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd ~/projet_docker_compose || git clone https://github.com/oussamajomaa/porjet_docker_compose.git
+            # Dossier du projet sur le VPS
+            cd ~
+            if [ ! -d "projet_docker_compose/.git" ]; then
+              git clone https://github.com/<TON_USER>/<TON_REPO>.git projet_docker_compose
+            fi
+
             cd projet_docker_compose
-            git pull
-            docker-compose down 
+            git pull origin main
+            docker-compose down
             docker-compose up -d --build
