@@ -38,7 +38,8 @@ jobs:
               git fetch origin main
               git reset --hard origin/main
             else
-              git clone git@github.com:osmjom/projet_docker_compose.git
+              git clone https://github.com/oussamajomaa/porjet_docker_compose.git
+
               cd projet_docker_compose
             fi
 
