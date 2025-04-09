@@ -18,32 +18,14 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Configuration SSH
-            mkdir -p ~/.ssh
-            echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-            echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile ~/.ssh/id_ed25519\n" > ~/.ssh/config
-            chmod 600 ~/.ssh/id_ed25519
-            chmod 700 ~/.ssh
-            chmod 644 ~/.ssh/config
-
-            # Ajouter GitHub à known_hosts
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-            # Vérification de la connexion SSH à GitHub
-            if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-              echo "Échec de l'authentification SSH avec GitHub"
-              exit 1
-            fi
-
-            # Gestion du dépôt
+            # Utilisez HTTPS avec un token pour cloner
             if [ -d "projet_docker_compose" ]; then
               echo "Le répertoire projet_docker_compose existe déjà, mise à jour du dépôt."
               cd projet_docker_compose
-              git fetch origin main
-              git reset --hard origin/main
+              git pull https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/projet_docker_compose.git
             else
               echo "Le répertoire projet_docker_compose n'existe pas, clonage du dépôt."
-              git clone git@github.com:oussamajomaa/projet_docker_compose.git
+              git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/projet_docker_compose.git
               cd projet_docker_compose
             fi
 
