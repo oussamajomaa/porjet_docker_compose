@@ -1,36 +1,41 @@
 name: Deploy to VPS
+
 on:
   push:
-    branches: [master, main]
+    branches: [main, master]
 
 jobs:
   deploy:
-    name: SSH & Deploy
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Déploiement via SSH
+      - name: SSH Deployment
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # Configuration SSH pour GitHub
+            # Configuration SSH stricte
             mkdir -p ~/.ssh
-            echo "${{ secrets.SSH_DEPLOY_KEY }}" > ~/.ssh/id_rsa
-            # Supprime les éventuels sauts de ligne
-            tr -d '\n' < ~/.ssh/id_rsa > ~/.ssh/id_rsa.tmp && mv ~/.ssh/id_rsa.tmp ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            echo "${{ secrets.SSH_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+            echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            chmod 600 ~/.ssh/id_ed25519
+            chmod 700 ~/.ssh
+            chmod 644 ~/.ssh/config
             
-            # Clonage du dépôt
+            # Vérification de la connexion SSH
+            if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+              echo "Échec de l'authentification SSH"
+              exit 1
+            fi
+            
+            # Gestion du dépôt
             if [ -d "projet_docker_compose" ]; then
               cd projet_docker_compose
-              git fetch && git reset --hard origin/main
+              git fetch origin main
+              git reset --hard origin/main
             else
               git clone git@github.com:osmjom/projet_docker_compose.git
               cd projet_docker_compose
