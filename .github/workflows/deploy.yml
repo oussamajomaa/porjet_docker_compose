@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false # Important pour éviter les conflits
 
       - name: Déploiement via SSH sur VPS
         uses: appleboy/ssh-action@master
@@ -21,12 +23,20 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            # Configuration Git (important pour le clonage)
+            git config --global credential.helper store
+            echo "https://${{ secrets.GH_TOKEN }}:@github.com" > ~/.git-credentials
+            
+            # Clonage ou mise à jour du dépôt
             cd ~
-            if [ ! -d "projet_docker_compose/.git" ]; then
-              git clone https://github.com/osmjom/projet_docker_compose.git projet_docker_compose
+            if [ -d "projet_docker_compose/.git" ]; then
+              cd projet_docker_compose
+              git pull origin main
+            else
+              git clone https://${{ secrets.GH_TOKEN }}@github.com/osmjom/projet_docker_compose.git
+              cd projet_docker_compose
             fi
-
-            cd projet_docker_compose
-            git pull origin main
+            
+            # Déploiement Docker
             docker-compose down
             docker-compose up -d --build
