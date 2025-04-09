@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
 
 jobs:
   deploy:
@@ -13,19 +13,19 @@ jobs:
       - name: SSH Deployment
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}        # Adresse IP ou nom de domaine de ton VPS
-          username: ${{ secrets.SSH_USER }}    # Nom d'utilisateur SSH (par ex. root ou deploy)
-          key: ${{ secrets.SSH_KEY }}          # Clé privée SSH
-          port: ${{ secrets.SSH_PORT }}        # Port SSH (par défaut 22)
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
-            # Vérifier l'authentification avec GitHub via SSH
+            # Configuration SSH
             mkdir -p ~/.ssh
             echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
             echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile ~/.ssh/id_ed25519\n" > ~/.ssh/config
             chmod 600 ~/.ssh/id_ed25519
             chmod 700 ~/.ssh
             chmod 644 ~/.ssh/config
-            
+
             # Vérification de la connexion SSH à GitHub
             if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
               echo "Échec de l'authentification SSH avec GitHub"
@@ -34,12 +34,13 @@ jobs:
 
             # Gestion du dépôt
             if [ -d "projet_docker_compose" ]; then
+              echo "Le répertoire projet_docker_compose existe déjà, mise à jour du dépôt."
               cd projet_docker_compose
               git fetch origin main
               git reset --hard origin/main
             else
-              git clone https://github.com/oussamajomaa/porjet_docker_compose.git
-
+              echo "Le répertoire projet_docker_compose n'existe pas, clonage du dépôt."
+              git clone git@github.com:osmjom/projet_docker_compose.git
               cd projet_docker_compose
             fi
 
