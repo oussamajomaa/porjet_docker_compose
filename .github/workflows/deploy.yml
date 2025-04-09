@@ -4,6 +4,7 @@ on:
   push:
     branches: [ master ]
 
+
 jobs:
   deploy:
     name: SSH & Deploy
@@ -21,22 +22,14 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          # port: ${{ secrets.SSH_PORT }}
           script: |
-            # Configuration Git (important pour le clonage)
-            git config --global credential.helper store
-            echo "https://${{ secrets.GH_TOKEN }}:@github.com" > ~/.git-credentials
+            mkdir -p ~/.ssh
+            echo "${{ secrets.SSH_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
             
-            # Clonage ou mise à jour du dépôt
-            cd ~
-            if [ -d "projet_docker_compose/.git" ]; then
-              cd projet_docker_compose
-              git pull origin main
-            else
-              git clone https://${{ secrets.GH_TOKEN }}@github.com/osmjom/projet_docker_compose.git
-              cd projet_docker_compose
-            fi
-            
-            # Déploiement Docker
-            docker-compose down
-            docker-compose up -d --build
+            git clone git@github.com:osmjom/projet_docker_compose.git || true
+            cd projet_docker_compose
+            git pull origin main
+            docker compose up -d --build
