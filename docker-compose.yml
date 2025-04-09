@@ -1,0 +1,27 @@
+services:
+  web: # service web
+    build: ./php # Construire une image à partir d'un fichier Dockerfile
+    container_name: php-app # nom du conteneur
+    restart: always # Redémarrer le conteneur
+    ports: # Mapper le port de apache sur le port 8080 en local
+      - "8080:80"
+    depends_on: # Le service web ne sera pas monté avant que le service db soit monté
+      - db
+    volumes: ["./php:/var/www/html"] # Pour synchroniser mon dossier local avec celui du conteneur
+    
+  db: # nom du service
+    build: ./db
+    container_name: mysql_db  # nom du conteneur
+    restart: always
+    ports:
+      - "3307:3306"
+    # environment:
+    #   MYSQL_ROOT_PASSWORD: root
+    #   MYSQL_DATABASE: docker_test
+    #   MYSQL_USER: osm
+    #   MYSQL_PASSWORD: osm
+    volumes: 
+      - db_data:/var/lib/mysql # 
+
+volumes:
+  db_data: # volume global pour persister les données
