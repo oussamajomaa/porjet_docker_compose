@@ -18,15 +18,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Utilisez HTTPS avec un token pour cloner
-            if [ -d "projet_docker_compose" ]; then
-              echo "Le répertoire projet_docker_compose existe déjà, mise à jour du dépôt."
-              cd projet_docker_compose
-              git pull https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/projet_docker_compose.git
+            # Utilisez le bon nom de dépôt (corrigé)
+            if [ -d "porjet_docker_compose" ]; then
+              echo "Le répertoire porjet_docker_compose existe déjà, mise à jour du dépôt."
+              cd porjet_docker_compose
+              git pull https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/porjet_docker_compose.git
             else
-              echo "Le répertoire projet_docker_compose n'existe pas, clonage du dépôt."
-              git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/projet_docker_compose.git
-              cd projet_docker_compose
+              echo "Le répertoire porjet_docker_compose n'existe pas, clonage du dépôt."
+              git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/porjet_docker_compose.git
+              cd porjet_docker_compose
             fi
 
             docker compose down
