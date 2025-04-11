@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            # Utilisez le bon nom de dépôt (corrigé)
+            # Utilisez le bon nom de dépôt
             if [ -d "porjet_docker_compose" ]; then
               echo "Le répertoire porjet_docker_compose existe déjà, mise à jour du dépôt."
               cd porjet_docker_compose
@@ -28,6 +28,6 @@ jobs:
               git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/oussamajomaa/porjet_docker_compose.git
               cd porjet_docker_compose
             fi
-
             docker compose down
             docker compose up -d --build --force-recreate
+            
